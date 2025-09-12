@@ -6,7 +6,7 @@ RUN apk add --no-cache \
     py3-pip \
     git \
     jq \
-    nc-openbsd
+    netcat-openbsd
 
 WORKDIR /app
 RUN git clone https://github.com/monteship/GreeMQTT.git . && \
