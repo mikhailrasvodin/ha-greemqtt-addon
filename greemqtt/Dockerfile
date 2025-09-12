@@ -10,7 +10,7 @@ RUN apk add --no-cache \
 
 WORKDIR /app
 RUN git clone https://github.com/monteship/GreeMQTT.git . && \
-    pip3 install -e .
+    pip3 install --break-system-packages -e .
 
 COPY run.sh /
 RUN chmod a+x /run.sh
