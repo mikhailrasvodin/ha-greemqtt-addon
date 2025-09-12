@@ -1,5 +1,5 @@
 name: "Gree MQTT Bridge"
-version: "1.1.0"
+version: "1.2.0"
 slug: "greemqtt"
 description: "Bridge between Gree air conditioners and MQTT with fast response system"
 url: "https://github.com/monteship/GreeMQTT"
@@ -57,4 +57,3 @@ schema:
       name: "str?"
   subnet: "str?"
   udp_port: "port?"
-image: "ghcr.io/home-assistant/{arch}-base"
