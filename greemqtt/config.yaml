@@ -1,7 +1,7 @@
 name: "Gree MQTT Bridge"
-version: "1.0.0"
+version: "1.1.0"
 slug: "greemqtt"
-description: "Bridge between Gree air conditioners and MQTT"
+description: "Bridge between Gree air conditioners and MQTT with fast response system"
 url: "https://github.com/monteship/GreeMQTT"
 arch:
   - amd64
@@ -15,12 +15,11 @@ boot: "auto"
 hassio_api: true
 hassio_role: "default"
 auto_uart: false
-devices:
-  - "/dev/ttyUSB0:/dev/ttyUSB0:rwm"
+host_network: true  # Wymagane dla odkrywania urządzeń UDP
 ports:
   "8080/tcp": null
 ports_description:
-  "8080/tcp": "Web interface (optional)"
+  "8080/tcp": "Web interface (if available)"
 map:
   - "config:rw"
   - "share:rw"
@@ -30,25 +29,32 @@ options:
   mqtt_username: ""
   mqtt_password: ""
   mqtt_topic: "gree"
-  discovery_timeout: 10
-  update_interval: 30
-  web_interface: true
-  web_port: 8080
+  update_interval: 3
   log_level: "INFO"
-  devices: []
+  # Zaawansowane ustawienia wydajności
+  adaptive_polling_timeout: 45
+  adaptive_fast_interval: 0.8
+  mqtt_message_workers: 3
+  immediate_response_timeout: 5
+  # Opcjonalne ustawienia sieciowe
+  network: []
+  subnet: ""
+  udp_port: 7000
 schema:
   mqtt_host: "str"
   mqtt_port: "port"
   mqtt_username: "str?"
   mqtt_password: "password?"
   mqtt_topic: "str"
-  discovery_timeout: "int(1,300)"
-  update_interval: "int(5,3600)"
-  web_interface: "bool"
-  web_port: "port"
+  update_interval: "int(1,60)"
   log_level: "list(DEBUG|INFO|WARNING|ERROR)?"
-  devices: 
+  adaptive_polling_timeout: "int(10,300)?"
+  adaptive_fast_interval: "float(0.1,5.0)?"
+  mqtt_message_workers: "int(1,10)?"
+  immediate_response_timeout: "int(1,30)?"
+  network: 
     - ip: "str"
       name: "str?"
-      mac: "str?"
-image: "monteship/greemqtt"
+  subnet: "str?"
+  udp_port: "port?"
+image: "ghcr.io/home-assistant/{arch}-base"

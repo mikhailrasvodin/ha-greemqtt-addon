@@ -1,22 +1,26 @@
-# Używamy istniejącego obrazu jako bazy
-FROM monteship/greemqtt:latest
-
-# Dodajemy s6-overlay dla lepszej integracji z Home Assistant
+# Używamy bazowego obrazu Home Assistant
 ARG BUILD_FROM
-ARG BUILD_ARCH
-ARG BUILD_VERSION
+FROM $BUILD_FROM
 
-# Instalujemy bashio i s6-overlay
+# Instalujemy wymagane pakiety
 RUN apk add --no-cache \
-    bashio \
-    jq
+    python3 \
+    py3-pip \
+    git \
+    jq \
+    nc-openbsd
 
-# Kopiujemy pliki konfiguracyjne
-COPY rootfs /
+# Pobieramy i instalujemy GreeMQTT
+WORKDIR /app
+RUN git clone https://github.com/monteship/GreeMQTT.git . && \
+    pip3 install -e .
 
 # Kopiujemy skrypt startowy
 COPY run.sh /
 RUN chmod a+x /run.sh
 
-# Ustawiamy punkt wejścia
-ENTRYPOINT ["/run.sh"]
+# Tworzymy katalogi
+RUN mkdir -p /data /config
+
+# Punkt wejścia
+CMD [ "/run.sh" ]
