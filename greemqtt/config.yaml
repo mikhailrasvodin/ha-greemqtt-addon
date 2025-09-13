@@ -1,5 +1,5 @@
 name: "Gree MQTT Bridge"
-version: "1.4.0"
+version: "1.5.0"
 slug: "greemqtt"
 description: "Bridge between Gree air conditioners and MQTT with fast response system"
 url: "https://github.com/monteship/GreeMQTT"
@@ -14,7 +14,7 @@ boot: "auto"
 hassio_api: true
 hassio_role: "default"
 auto_uart: false
-host_network: true  # wymagane dla odkrywania urządzeń UDP
+host_network: true 
 ports:
   "8080/tcp": null
 ports_description:
@@ -54,4 +54,3 @@ schema:
       name: "str?"
   subnet: "str?"
   udp_port: "port?"
-image: "monteship/greemqtt:latest"
