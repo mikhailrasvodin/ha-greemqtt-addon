@@ -1,6 +1,7 @@
+#!/usr/bin/with-contenv bashio
 set -e
 
-bashio::log.info "Starting Gree MQTT Bridge..."
+bashio::log.info "🏠 Starting Gree MQTT Bridge Add-on..."
 
 setup_environment() {
     export MQTT_BROKER=$(bashio::config 'mqtt_host' 'core-mosquitto')
@@ -16,19 +17,49 @@ setup_environment() {
     export IMMEDIATE_RESPONSE_TIMEOUT=$(bashio::config 'immediate_response_timeout' '5')
 
     if bashio::config.has_value 'network'; then
-        export NETWORK=$(bashio::config 'network | jq -r '.[].ip' | paste -sd, -)
+        export NETWORK=$(
+            bashio::config 'network' \
+                | jq -r '.[].ip' \
+                | paste -sd, -
+        )
     fi
+
     if bashio::config.has_value 'subnet'; then
         export SUBNET=$(bashio::config 'subnet')
     fi
+
     if bashio::config.has_value 'udp_port'; then
         export UDP_PORT=$(bashio::config 'udp_port')
+    fi
+
+    bashio::log.info "Configuration loaded:"
+    bashio::log.info "- MQTT Broker: ${MQTT_BROKER}"
+    bashio::log.info "- MQTT Port: ${MQTT_PORT}"
+    bashio::log.info "- MQTT User: ${MQTT_USER}"
+    bashio::log.info "- MQTT Topic: ${MQTT_TOPIC}"
+    bashio::log.info "- Update Interval: ${UPDATE_INTERVAL}s"
+    bashio::log.info "- Adaptive Polling Timeout: ${ADAPTIVE_POLLING_TIMEOUT}s"
+    bashio::log.info "- Fast Polling Interval: ${ADAPTIVE_FAST_INTERVAL}s"
+    bashio::log.info "- MQTT Workers: ${MQTT_MESSAGE_WORKERS}"
+    bashio::log.info "- Immediate Response Timeout: ${IMMEDIATE_RESPONSE_TIMEOUT}s"
+
+    if [ -n "${NETWORK:-}" ]; then
+        bashio::log.info "- Device Network: ${NETWORK}"
+    else
+        bashio::log.info "- Device Discovery: Auto-scan enabled"
+    fi
+
+    if [ -n "${SUBNET:-}" ]; then
+        bashio::log.info "- Subnet: ${SUBNET}"
+    fi
+
+    if [ -n "${UDP_PORT:-}" ]; then
+        bashio::log.info "- UDP Port: ${UDP_PORT}"
     fi
 }
 
 run_application() {
     bashio::log.info "🚀 Launching GreeMQTT..."
-    # zamiast python -m GreeMQTT
     exec uv run GreeMQTT
 }
 
@@ -36,5 +67,7 @@ main() {
     setup_environment
     run_application
 }
+
+trap 'bashio::log.info "🛑 Shutting down Gree MQTT Bridge..."; exit 0' SIGTERM SIGINT
 
 main "$@"
