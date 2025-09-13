@@ -14,7 +14,7 @@ from GreeMQTT.logger import log
 from GreeMQTT.mqtt_client import create_mqtt_client
 from GreeMQTT.mqtt_handler import start_cleanup_task, start_device_tasks
 
-log.info("GreeMQTT package initialized")
+log.info("GreeMQTT package initialized (patch 1)")
 
 
 class GreeMQTTApp:
