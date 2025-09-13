@@ -1,5 +1,8 @@
-#!/usr/bin/env bashio
+#!/bin/bash
 set -e
+
+# Source bashio library
+source /usr/lib/bashio/lib/bashio.sh
 
 bashio::log.info "🏠 Starting Gree MQTT Bridge Add-on..."
 
