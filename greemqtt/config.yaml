@@ -1,5 +1,5 @@
 name: "Gree MQTT Bridge"
-version: "1.5.8"
+version: "1.5.9"
 slug: "greemqtt"
 description: "Bridge between Gree air conditioners and MQTT with fast response system"
 url: "https://github.com/monteship/GreeMQTT"
@@ -31,7 +31,7 @@ options:
   update_interval: 3
   log_level: "INFO"
   adaptive_polling_timeout: 45
-  adaptive_fast_interval: 0.8
+  adaptive_fast_interval: 1
   mqtt_message_workers: 3
   immediate_response_timeout: 5
   network: []
@@ -46,7 +46,7 @@ schema:
   update_interval: "int(1,60)"
   log_level: "list(DEBUG|INFO|WARNING|ERROR)?"
   adaptive_polling_timeout: "int(10,300)?"
-  adaptive_fast_interval: "float(0.1,5.0)?"
+  adaptive_fast_interval: "int(1,5)?"
   mqtt_message_workers: "int(1,10)?"
   immediate_response_timeout: "int(1,30)?"
   network: 

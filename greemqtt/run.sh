@@ -37,7 +37,7 @@ setup_environment() {
     export UPDATE_INTERVAL=$(get_config 'update_interval' '3')
     export LOG_LEVEL=$(get_config 'log_level' 'INFO')
     export ADAPTIVE_POLLING_TIMEOUT=$(get_config 'adaptive_polling_timeout' '45')
-    export ADAPTIVE_FAST_INTERVAL=$(get_config 'adaptive_fast_interval' '0.8')
+    export ADAPTIVE_FAST_INTERVAL=$(get_config 'adaptive_fast_interval' '1')
     export MQTT_MESSAGE_WORKERS=$(get_config 'mqtt_message_workers' '3')
     export IMMEDIATE_RESPONSE_TIMEOUT=$(get_config 'immediate_response_timeout' '5')
 
