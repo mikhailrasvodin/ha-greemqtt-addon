@@ -1,5 +1,5 @@
 name: "Gree MQTT Bridge"
-version: "1.5.3"
+version: "1.5.4"
 slug: "greemqtt"
 description: "Bridge between Gree air conditioners and MQTT with fast response system"
 url: "https://github.com/monteship/GreeMQTT"
