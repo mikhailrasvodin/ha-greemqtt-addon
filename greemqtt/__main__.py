@@ -178,11 +178,11 @@ class GreeMQTTApp:
         except KeyboardInterrupt:
             log.info("Application interrupted by user")
         except Exception as e:
-            log.error("Application error, but will continue running", error=str(e))
+            log.error("Application error, but will continue running (CUSTOM ERROR HANDLING)", error=str(e))
             # Don't exit here - let the application continue running
             try:
                 # Wait for shutdown signal even after error
-                log.info("Application continuing despite errors - press Ctrl+C to stop")
+                log.info("🔧 CUSTOM: Application continuing despite errors - press Ctrl+C to stop")
                 await self.stop_event.wait()
             except Exception:
                 pass
