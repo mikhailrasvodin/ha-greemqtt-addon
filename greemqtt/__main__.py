@@ -1,3 +1,10 @@
+#!/usr/bin/env python3
+"""
+USING CUSTOM ERROR-RESISTANT VERSION - PATCH 1
+This is a modified version of the original GreeMQTT main module
+with enhanced error handling and resilience.
+"""
+
 import asyncio
 import ipaddress
 import os
@@ -14,7 +21,7 @@ from GreeMQTT.logger import log
 from GreeMQTT.mqtt_client import create_mqtt_client
 from GreeMQTT.mqtt_handler import start_cleanup_task, start_device_tasks
 
-log.info("GreeMQTT package initialized (patch 1)")
+log.info("🔧 CUSTOM: GreeMQTT package initialized (patch 1) - ERROR-RESISTANT VERSION")
 
 
 class GreeMQTTApp:
@@ -37,7 +44,7 @@ class GreeMQTTApp:
         known_devices = device_db.get_all_devices()
         if not device_ips:
             subnet = os.environ.get("SUBNET", "192.168.1.0/24")
-            log.info("Scanning network for devices", subnet=subnet)
+            log.info("🔧 CUSTOM: Scanning network for devices", subnet=subnet)
 
             # Get all valid IPs (exclude network and broadcast addresses)
             network = ipaddress.IPv4Network(subnet)
@@ -72,14 +79,14 @@ class GreeMQTTApp:
                                     device.key,
                                     device.is_GCM,
                                 )
-                                log.info("Found new device", ip=target_ip)
+                                log.info("🔧 CUSTOM: Found new device", ip=target_ip)
                             else:
-                                log.warning("Device not found or invalid key", ip=target_ip)
+                                log.warning("🔧 CUSTOM: Device not found or invalid key", ip=target_ip)
                         return device
                 except Exception as e:
-                    log.error("Error scanning IP", ip=target_ip, error=str(e))
+                    log.error("🔧 CUSTOM: Error scanning IP", ip=target_ip, error=str(e))
                 if len(device_ips) % 20 == 0:
-                    log.info("Scanned IPs", scanned_ips=len(device_ips))
+                    log.info("🔧 CUSTOM: Scanned IPs", scanned_ips=len(device_ips))
                 return None
 
         # Create all scan tasks
@@ -90,10 +97,10 @@ class GreeMQTTApp:
             try:
                 device = await task
                 if isinstance(device, Device) and device is not None:
-                    log.info("Device found", ip=device.device_ip, id=device.device_id)
+                    log.info("🔧 CUSTOM: Device found", ip=device.device_ip, id=device.device_id)
                     yield device
             except Exception as e:
-                log.warning("Exception during device scan task", error=str(e))
+                log.warning("🔧 CUSTOM: Exception during device scan task", error=str(e))
                 pass  # Ignore exceptions from individual scans
 
     async def discover_and_setup_devices(self):
@@ -102,6 +109,8 @@ class GreeMQTTApp:
         network = NETWORK.copy() if NETWORK else []
         successful_devices = 0
         failed_devices = []
+
+        log.info("🔧 CUSTOM: Starting device discovery and setup")
 
         try:
             async for device in self.scan_network_for_devices(network):
@@ -113,12 +122,12 @@ class GreeMQTTApp:
                         network.remove(device.device_ip)
                     
                     await start_device_tasks(device, mqtt_client, self.stop_event)
-                    log.info("Started device successfully", ip=device.device_ip, id=device.device_id)
+                    log.info("🔧 CUSTOM: Started device successfully", ip=device.device_ip, id=device.device_id)
                     successful_devices += 1
                     
                 except Exception as e:
                     log.error(
-                        "Failed to setup device, but continuing with others", 
+                        "🔧 CUSTOM: Failed to setup device, but continuing with others", 
                         ip=device.device_ip, 
                         id=getattr(device, 'device_id', 'unknown'),
                         error=str(e)
@@ -130,11 +139,11 @@ class GreeMQTTApp:
                     })
                     continue  # Continue with next device instead of failing
         except Exception as e:
-            log.error("Error during device discovery, but application will continue", error=str(e))
+            log.error("🔧 CUSTOM: Error during device discovery, but application will continue", error=str(e))
 
         if network:
             log.warning(
-                "Some devices were not found in the network",
+                "🔧 CUSTOM: Some devices were not found in the network",
                 missing_devices=network,
             )
             # Start retry manager for missing devices
@@ -143,11 +152,11 @@ class GreeMQTTApp:
                 retry_manager = DeviceRetryManager(network, self.stop_event)
                 asyncio.create_task(retry_manager.run())  # Run in background, don't await
             except Exception as e:
-                log.error("Failed to start retry manager, but continuing", error=str(e))
+                log.error("🔧 CUSTOM: Failed to start retry manager, but continuing", error=str(e))
 
         # Log summary
         log.info(
-            "Device setup completed", 
+            "🔧 CUSTOM: Device setup completed", 
             successful=successful_devices, 
             failed=len(failed_devices),
             failed_devices=failed_devices if failed_devices else None
@@ -155,10 +164,11 @@ class GreeMQTTApp:
         
         # Don't fail the application even if some devices failed
         if successful_devices == 0 and failed_devices:
-            log.warning("No devices were successfully setup, but application will continue running")
+            log.warning("🔧 CUSTOM: No devices were successfully setup, but application will continue running")
         
     async def run(self):
         """Main application entry point."""
+        log.info("🔧 CUSTOM: Starting GreeMQTT application - ERROR-RESISTANT VERSION")
         self.setup_signal_handlers()
 
         try:
@@ -169,16 +179,16 @@ class GreeMQTTApp:
             try:
                 await start_cleanup_task(self.stop_event)
             except Exception as e:
-                log.error("Failed to start cleanup task, but continuing", error=str(e))
+                log.error("🔧 CUSTOM: Failed to start cleanup task, but continuing", error=str(e))
 
             # Wait for shutdown signal
-            log.info("Application running - press Ctrl+C to stop")
+            log.info("🔧 CUSTOM: Application running - press Ctrl+C to stop")
             await self.stop_event.wait()
 
         except KeyboardInterrupt:
-            log.info("Application interrupted by user")
+            log.info("🔧 CUSTOM: Application interrupted by user")
         except Exception as e:
-            log.error("Application error, but will continue running (CUSTOM ERROR HANDLING)", error=str(e))
+            log.error("🔧 CUSTOM: Application error, but will continue running (CUSTOM ERROR HANDLING)", error=str(e))
             # Don't exit here - let the application continue running
             try:
                 # Wait for shutdown signal even after error
@@ -190,15 +200,17 @@ class GreeMQTTApp:
 
 def main():
     """Simple main function entry point."""
+    log.info("🔧 CUSTOM: Main function called - ERROR-RESISTANT VERSION")
     try:
         app = GreeMQTTApp()
         asyncio.run(app.run())
     except KeyboardInterrupt:
-        log.info("Application interrupted by user")
+        log.info("🔧 CUSTOM: Application interrupted by user")
     except Exception as e:
-        log.error("Fatal error", error=str(e))
+        log.error("🔧 CUSTOM: Fatal error", error=str(e))
         sys.exit(1)
 
 
 if __name__ == "__main__":
+    log.info("🔧 CUSTOM: __main__ module executed directly")
     main()

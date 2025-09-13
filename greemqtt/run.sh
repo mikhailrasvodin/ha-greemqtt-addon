@@ -3,6 +3,42 @@ set -e
 
 echo "🏠 Starting Gree MQTT Bridge Add-on..."
 
+# DEBUG: Check if our custom file is in place - THIS WILL SHOW IN HA LOGS
+echo "🔍 DEBUG: Checking for custom __main__.py..."
+if [ -f "/app/GreeMQTT/__main__.py" ]; then
+    echo "✅ Found __main__.py at /app/GreeMQTT/__main__.py"
+    
+    # Check for our custom markers
+    if grep -q "patch 1" /app/GreeMQTT/__main__.py; then
+        echo "✅ SUCCESS: Found 'patch 1' marker in __main__.py"
+    else
+        echo "❌ ERROR: 'patch 1' marker NOT found in __main__.py"
+    fi
+    
+    if grep -q "CUSTOM ERROR HANDLING" /app/GreeMQTT/__main__.py; then
+        echo "✅ SUCCESS: Found 'CUSTOM ERROR HANDLING' marker in __main__.py"
+    else
+        echo "❌ ERROR: 'CUSTOM ERROR HANDLING' marker NOT found in __main__.py"
+    fi
+    
+    if grep -q "ERROR-RESISTANT VERSION" /app/GreeMQTT/__main__.py; then
+        echo "✅ SUCCESS: Found 'ERROR-RESISTANT VERSION' marker in __main__.py"
+    else
+        echo "❌ ERROR: 'ERROR-RESISTANT VERSION' marker NOT found in __main__.py"
+    fi
+    
+    # Show first 20 lines of the file
+    echo "🔍 DEBUG: First 20 lines of __main__.py:"
+    head -20 /app/GreeMQTT/__main__.py
+    
+    # Show file size and modification time
+    echo "🔍 DEBUG: File info:"
+    ls -la /app/GreeMQTT/__main__.py
+    
+else
+    echo "❌ ERROR: __main__.py NOT found at /app/GreeMQTT/__main__.py"
+fi
+
 # Read configuration from options.json
 CONFIG_PATH=/data/options.json
 
@@ -62,10 +98,7 @@ setup_environment() {
     echo "- MQTT User: ${MQTT_USER}"
     echo "- MQTT Topic: ${MQTT_TOPIC}"
     echo "- Update Interval: ${UPDATE_INTERVAL}s"
-    echo "- Adaptive Polling Timeout: ${ADAPTIVE_POLLING_TIMEOUT}s"
-    echo "- Fast Polling Interval: ${ADAPTIVE_FAST_INTERVAL}s"
-    echo "- MQTT Workers: ${MQTT_MESSAGE_WORKERS}"
-    echo "- Immediate Response Timeout: ${IMMEDIATE_RESPONSE_TIMEOUT}s"
+    echo "- Log Level: ${LOG_LEVEL}"
 
     if [ -n "${NETWORK:-}" ]; then
         echo "- Device Network: ${NETWORK}"
@@ -76,14 +109,19 @@ setup_environment() {
     if [ -n "${SUBNET:-}" ]; then
         echo "- Subnet: ${SUBNET}"
     fi
-
-    if [ -n "${UDP_PORT:-}" ]; then
-        echo "- UDP Port: ${UDP_PORT}"
-    fi
 }
 
 run_application() {
     echo "🚀 Launching GreeMQTT..."
+    echo "🔍 FINAL CHECK: Looking for custom version markers just before launch..."
+    
+    # Final verification that our patches are in place
+    if grep -q "🔧 CUSTOM:" /app/GreeMQTT/__main__.py; then
+        echo "✅ CONFIRMED: Custom patches detected - launching patched version"
+    else
+        echo "❌ WARNING: Custom patches NOT detected - launching original version"
+    fi
+    
     exec uv run GreeMQTT
 }
 
